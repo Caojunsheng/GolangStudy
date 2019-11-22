@@ -1,7 +1,7 @@
 ### 1. golang pointer address
 When you need to change a value of a variable, but don't have direct access to it, only exposure a function to change it.
 
-refer to **gopointer.go**
+refer to [gopointer.go](https://github.com/Caojunsheng/GolangStudy/blob/master/code/basics/gopointer.go)
 ```
 package main
 
