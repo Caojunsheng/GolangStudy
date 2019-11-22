@@ -36,7 +36,7 @@ execute.
 
 If there is no case satisfied, then will execute the default sentence.
 
-refer to **select.go**
+refer to [select.go](./select.go)
 
 ```
 package main
