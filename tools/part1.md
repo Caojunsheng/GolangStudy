@@ -1,4 +1,4 @@
-###1. golang UT coverage
+### 1. golang UT coverage
 When you want to scan all go files in a package, and want to calculate the ut coverage of this package
 
 **Installation**
