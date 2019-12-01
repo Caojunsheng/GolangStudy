@@ -1,5 +1,5 @@
 ### 1. golang pointer address
-When you need to change a value of a variable, but don't have direct access to it, only exposure a function to change it.
+当需要修改一个指针的值，又无法直接给它赋值，通过函数去修改的时候，可以通过下面方式修改变量的值.
 
 refer to [gopointer.go](https://github.com/Caojunsheng/GolangStudy/blob/master/code/basics/gopointer.go)
 ```
@@ -30,11 +30,11 @@ func changeStr(str *string) {
 
 ```
 ### 2. golang select specific character
-The randomness of select will have some issue when more than one case in select 
-are satisfied at the same time, then select will random choose a case to 
-execute.
+golang语言的select特殊特性，当两个select的case同时满足的时候，golang只会选择其中的一个执行，另一个无法执行到。
+如果你有两个定时任务，同时触发，那么这时候只会有其中一个被触发。
 
-If there is no case satisfied, then will execute the default sentence.
+如果没有任何一个case满足，那么将会执行default的语句。
+
 
 refer to [select.go](./select.go)
 
@@ -60,5 +60,3 @@ func main() {
 	}
 }
 ```
-Especially when you use two schedule job, and when the two schedule jobs
- triggered at the same time, then one job will not be executed this period.
