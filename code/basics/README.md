@@ -157,6 +157,8 @@ func main() {
 
 - 编写json解析的rpc服务端
 
+参考https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-01-rpc-intro.html
+
 refer to [jsonrpcserver.go](./jsonrpcserver.go)
 ```go
 package main
