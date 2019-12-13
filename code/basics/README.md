@@ -114,3 +114,105 @@ BenchmarkUseStringBuilder-4              1515824               791 ns/op
 BenchmarkUseStringBuilder-8              1511204               792 ns/op
 
 ```
+
+### 4.golang 跨语言的RPC调用
+通过官方自带的net/rpc/jsonrpc扩展实现一个跨语言的RPC。
+
+- 编写json rpc客户端
+
+fefer to [jsonrpcclient.go](./jsonrpcclient.go)
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "net"
+    "net/rpc"
+    "net/rpc/jsonrpc"
+)
+
+func main() {
+    conn, err := net.Dial("tcp", "localhost:1234")
+    if err != nil {
+        log.Fatal("net.Dial:", err)
+    }
+
+    client := rpc.NewClientWithCodec(jsonrpc.NewClientCodec(conn))
+
+    var reply string
+    err = client.Call("HelloService.Hello", "hello", &reply)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Println(reply)
+}
+```
+先手工调用net.Dial函数建立TCP链接，然后基于该链接建立针对客户端的json编解码器。
+
+在确保客户端可以正常调用RPC服务的方法之后，我们用一个普通的TCP服务代替Go语言版本的RPC服务，这样可以查看客户端调用时发送的数据格式。比如通过nc命令nc -l 1234在同样的端口启动一个TCP服务。然后再次执行一次RPC调用(go run jsonrpcclient.go)将会发现nc输出了以下的信息：
+
+{"method":"HelloService.Hello","params":["hello"],"id":0}
+
+- 编写json解析的rpc服务端
+
+refer to [jsonrpcserver.go](./jsonrpcserver.go)
+```go
+package main
+
+import (
+    "log"
+    "net"
+    "net/rpc"
+    "net/rpc/jsonrpc"
+)
+
+type HelloService struct {}
+
+func (p *HelloService) Hello(request string, reply *string) error {
+    *reply = "hello:" + request
+    return nil
+}
+
+func main() {
+    rpc.RegisterName("HelloService", new(HelloService))
+
+    listener, err := net.Listen("tcp", ":1234")
+    if err != nil {
+        log.Fatal("ListenTCP error:", err)
+    }
+
+    for {
+        conn, err := listener.Accept()
+        if err != nil {
+            log.Fatal("Accept error:", err)
+        }
+
+        go rpc.ServeCodec(jsonrpc.NewServerCodec(conn))
+    }
+}
+```
+通过命令启动rpc server之后，go run jsonrpcserver.go，
+我们可以通过直接向架设了RPC服务的TCP服务器发送json数据模拟RPC方法调用：
+```bash
+echo -e '{"method":"HelloService.Hello","params":["hello"],"id":0}'|nc localhost 1234
+```
+得到如下json格式的结果：
+```json
+{"id":1,"result":"hello:hello","error":null}
+```
+其实本质上rpc的request和response如下结构：
+```go
+type clientRequest struct {
+    Method string         `json:"method"`
+    Params [1]interface{} `json:"params"`
+    Id     uint64         `json:"id"`
+}
+
+type serverRequest struct {
+    Method string           `json:"method"`
+    Params *json.RawMessage `json:"params"`
+    Id     *json.RawMessage `json:"id"`
+}
+```

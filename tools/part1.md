@@ -52,3 +52,18 @@ consumed: 213： 申请的系统内存
 
 ```
 
+### 3. golang 生成pprof的cpu，mem图和火焰图
++ 使用go自带的pprof工具对dump出的文件进行分析
+```bash
+go tool pprof <code_binary> /tmp/cpu.pprof
+go tool pprof <code_binary> /tmp/mem.pprof
+pprof>svg
+pprof>top
+```
++ 使用go-torch生成火焰图
+```bash
+go get github.com/uber/go-torch
+git clone https://github.com/brendangregg/FlameGraph
+export PATH=$PATH:/path/FlameGraph
+go-torch --binaryname=./<code_binary> --binaryinput=./cpu.pprof
+```
