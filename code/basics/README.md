@@ -61,7 +61,7 @@ func main() {
 }
 ```
 
-### 3.golang 字符串拼接及相关benchmark测试结果
+### 3. golang 字符串拼接及相关benchmark测试结果
 golang中字符串拼接有多种方式：
 1. 使用"+"来拼接字符串
 2. 使用bytes.buffer来拼接
@@ -115,7 +115,7 @@ BenchmarkUseStringBuilder-8              1511204               792 ns/op
 
 ```
 
-### 4.golang 跨语言的RPC调用
+### 4. golang 跨语言的RPC调用
 通过官方自带的net/rpc/jsonrpc扩展实现一个跨语言的RPC。
 
 参考https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-01-rpc-intro.html
