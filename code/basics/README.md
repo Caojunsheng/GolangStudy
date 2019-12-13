@@ -118,6 +118,7 @@ BenchmarkUseStringBuilder-8              1511204               792 ns/op
 ### 4.golang 跨语言的RPC调用
 通过官方自带的net/rpc/jsonrpc扩展实现一个跨语言的RPC。
 
+参考https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-01-rpc-intro.html
 - 编写json rpc客户端
 
 fefer to [jsonrpcclient.go](./jsonrpcclient.go)
@@ -156,8 +157,6 @@ func main() {
 {"method":"HelloService.Hello","params":["hello"],"id":0}
 
 - 编写json解析的rpc服务端
-
-参考https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-01-rpc-intro.html
 
 refer to [jsonrpcserver.go](./jsonrpcserver.go)
 ```go
