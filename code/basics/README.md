@@ -1,4 +1,4 @@
-### 1. golang pointer address
+### 1. golang 指针地址的修改
 当需要修改一个指针的值，又无法直接给它赋值，通过函数去修改的时候，可以通过下面方式修改变量的值.
 
 refer to [gopointer.go](https://github.com/Caojunsheng/GolangStudy/blob/master/code/basics/gopointer.go)
@@ -29,7 +29,7 @@ func changeStr(str *string) {
 }
 
 ```
-### 2. golang select specific character
+### 2. golang select的特殊特性
 golang语言的select特殊特性，当两个select的case同时满足的时候，golang只会选择其中的一个执行，另一个无法执行到。
 如果你有两个定时任务，同时触发，那么这时候只会有其中一个被触发。
 
