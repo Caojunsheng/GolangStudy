@@ -239,12 +239,12 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 	if c.closed != 0 {
 		unlock(&c.lock)
+		// 如果chan已经关闭了，再向chan发送数据，直接报panic
 		panic(plainError("send on closed channel"))
 	}
 
 	if sg := c.recvq.dequeue(); sg != nil {
-		// Found a waiting receiver. We pass the value we want to send
-		// directly to the receiver, bypassing the channel buffer (if any).
+		// 如果有接受者在等待，直接
 		send(c, sg, ep, func() { unlock(&c.lock) }, 3)
 		return true
 	}
@@ -325,6 +325,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyOTA0MjA5NzEsLTM0NDU2NTYwMywxMj
-M1NzA3MjA2XX0=
+eyJoaXN0b3J5IjpbLTI1OTg2MjY4LC0zNDQ1NjU2MDMsMTIzNT
+cwNzIwNl19
 -->
