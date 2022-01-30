@@ -119,7 +119,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	if sg := c.sendq.dequeue(); sg != nil {
 		// 如果sender中有等待发送，那么可以分为两种情况
 		// 1、非缓冲队列，即同步chan，则直接从sender中接收值。
-		// 2、否则的话，从huancho队列的头部接收值
+		// 2、缓冲队列，即异步chan，从缓冲队列的头部拷贝到接收者，拷贝发送队列的值到缓冲队列末尾
 		recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
 		return true, true
 	}
@@ -207,5 +207,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTI0ODI1MDc2MV19
+eyJoaXN0b3J5IjpbMTIzNTcwNzIwNl19
 -->
