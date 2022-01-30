@@ -115,7 +115,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		throw("unreachable")
 	}
 
-	// Fast path: check for failed non-blocking operation without acquiring the lock.
+	// 如果是非阻塞且chan是空的
 	if !block && empty(c) {
 		// After observing that the channel is not ready for receiving, we observe whether the
 		// channel is closed.
@@ -240,5 +240,6 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTgxNTY3NTg3MCwtMTgyMDQ0NTcwXX0=
+eyJoaXN0b3J5IjpbMzc3NTA3NTY3LDE4MTU2NzU4NzAsLTE4Mj
+A0NDU3MF19
 -->
