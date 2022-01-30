@@ -238,8 +238,16 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	releaseSudog(mysg)
 	return true, success
 }
+
+func empty(c *hchan) bool {
+	// c.dataqsiz is immutable.
+	if c.dataqsiz == 0 {
+		return atomic.Loadp(unsafe.Pointer(&c.sendq.first)) == nil
+	}
+	return atomic.Loaduint(&c.qcount) == 0
+}
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMzc3NTA3NTY3LDE4MTU2NzU4NzAsLTE4Mj
+eyJoaXN0b3J5IjpbNTg3MjQxODU3LDE4MTU2NzU4NzAsLTE4Mj
 A0NDU3MF19
 -->
