@@ -90,7 +90,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 				raceacquire(c.raceaddr())
 			}
 			if ep != nil {
-			    // 对于已关闭的chan执行jieshou清理ep的内存
+			    // 对于已关闭的chan执行接收，不忽略返回值的情况下，会受到该类型的零值，清理ep的内存
 				typedmemclr(c.elemtype, ep)
 			}
 			// 返回selected为true
@@ -208,5 +208,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4Nzg0ODcwOTZdfQ==
+eyJoaXN0b3J5IjpbLTEyMjIyMzM2MTJdfQ==
 -->
