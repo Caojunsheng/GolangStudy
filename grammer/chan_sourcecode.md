@@ -316,20 +316,20 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 	return true
 }
 ```
+full源码
 ```go
 func full(c *hchan) bool {
 	// 非缓冲chan，判断recvq为空，则认为满
 	if c.dataqsiz == 0 {
-		// Assumes that a pointer read is relaxed-atomic.
 		return c.recvq.first == nil
 	}
-	// 缓冲chan，
+	// 缓冲chan，缓冲区数量等于chan大小
 	return c.qcount == c.dataqsiz
 }
 ```
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE2NjEzMTMyNTYsMTAxNjU1ODA3NSwtMz
-Q0NTY1NjAzLDEyMzU3MDcyMDZdfQ==
+eyJoaXN0b3J5IjpbMTQzNDY4MjkwMCwxMDE2NTU4MDc1LC0zND
+Q1NjU2MDMsMTIzNTcwNzIwNl19
 -->
