@@ -224,30 +224,8 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 		throw("unreachable")
 	}
 
-	if debugChan {
-		print("chansend: chan=", c, "\n")
-	}
-
-	if raceenabled {
-		racereadpc(c.raceaddr(), callerpc, funcPC(chansend))
-	}
-
-	// Fast path: check for failed non-blocking operation without acquiring the lock.
-	//
-	// After observing that the channel is not closed, we observe that the channel is
-	// not ready for sending. Each of these observations is a single word-sized read
-	// (first c.closed and second full()).
-	// Because a closed channel cannot transition from 'ready for sending' to
-	// 'not ready for sending', even if the channel is closed between the two observations,
-	// they imply a moment between the two when the channel was both not yet closed
-	// and not ready for sending. We behave as if we observed the channel at that moment,
-	// and report that the send cannot proceed.
-	//
-	// It is okay if the reads are reordered here: if we observe that the channel is not
-	// ready for sending and then observe that it is not closed, that implies that the
-	// channel wasn't closed during the first observation. However, nothing here
-	// guarantees forward progress. We rely on the side effects of lock release in
-	// chanrecv() and closechan() to update this thread's view of c.closed and full().
+	...
+	// 如果是非阻塞的，chan未关闭，且chan的buffer已经满了，则返回发送失败
 	if !block && c.closed == 0 && full(c) {
 		return false
 	}
@@ -347,6 +325,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTY4ODM4MDYzNSwtMzQ0NTY1NjAzLDEyMz
-U3MDcyMDZdfQ==
+eyJoaXN0b3J5IjpbLTEyOTA0MjA5NzEsLTM0NDU2NTYwMywxMj
+M1NzA3MjA2XX0=
 -->
