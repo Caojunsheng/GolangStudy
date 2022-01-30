@@ -262,26 +262,25 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 		if c.sendx == c.dataqsiz {
 			c.sendx = 0
 		}
-		// huanc数量+1
+		// 缓冲区数量+1
 		c.qcount++
 		unlock(&c.lock)
 		return true
 	}
-
+    // 非阻塞的chan，直接返回写入失败
 	if !block {
 		unlock(&c.lock)
 		return false
 	}
 
-	// Block on the channel. Some receiver will complete our operation for us.
+	// chan满了，发送者会被阻塞，构造一个sudog挂起
 	gp := getg()
 	mysg := acquireSudog()
 	mysg.releasetime = 0
 	if t0 != 0 {
 		mysg.releasetime = -1
 	}
-	// No stack splits between assigning elem and enqueuing mysg
-	// on gp.waiting where copystack can find it.
+
 	mysg.elem = ep
 	mysg.waitlink = nil
 	mysg.g = gp
@@ -289,6 +288,7 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 	mysg.c = c
 	gp.waiting = mysg
 	gp.param = nil
+	// 构造sudog放入发送者
 	c.sendq.enqueue(mysg)
 	// Signal to anyone trying to shrink our stack that we're about
 	// to park on a channel. The window between when this G's status
@@ -328,6 +328,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTkyNzIxMzI4OCwtMzQ0NTY1NjAzLDEyMz
-U3MDcyMDZdfQ==
+eyJoaXN0b3J5IjpbLTIxMjkwMzA2NTIsLTM0NDU2NTYwMywxMj
+M1NzA3MjA2XX0=
 -->
