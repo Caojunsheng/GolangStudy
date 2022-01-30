@@ -213,10 +213,13 @@ func empty(c *hchan) bool {
 
 ```go
 func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
+    // 如果chan是空
 	if c == nil {
+	    // 非阻塞，直接返回false，表示未发送成功
 		if !block {
 			return false
 		}
+		// 阻塞的，挂起goroutine
 		gopark(nil, nil, waitReasonChanSendNilChan, traceEvGoStop, 2)
 		throw("unreachable")
 	}
@@ -344,6 +347,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTY5NjA0ODcxNCwtMzQ0NTY1NjAzLDEyMz
+eyJoaXN0b3J5IjpbLTY4ODM4MDYzNSwtMzQ0NTY1NjAzLDEyMz
 U3MDcyMDZdfQ==
 -->
