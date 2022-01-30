@@ -45,8 +45,9 @@ func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
     return
 }
 ```
-第一只
+`chanrecv1`不返回ok，`chanrecv2`返回ok，两个最终都是调用`chanrecv`函数
 ```go
+// src/runtime/chan.go:454
 // chanrecv receives on channel c and writes the received data to ep.// ep may be nil, in which case received data is ignored.  
 // If block == false and no elements are available, returns (false, false).// Otherwise, if c is closed, zeros *ep and returns (true, false).  
 // Otherwise, fills in *ep with an element and returns (true, true).  
@@ -171,6 +172,6 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMzI0NjU4MjIsMzc5NTMzNTgsLTE2Mz
-IxMzM3MzBdfQ==
+eyJoaXN0b3J5IjpbMTE2NDA4NjkxNywzNzk1MzM1OCwtMTYzMj
+EzMzczMF19
 -->
