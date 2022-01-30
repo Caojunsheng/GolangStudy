@@ -36,7 +36,7 @@ func closechan(c *hchan) {
 -   chan关闭之后，关闭前放入的数据，仍然可以读取
 -   已关闭的chan仍然可以读取，值为零值，返回值ok为false
 
-## chan源码解读
+## 二、chan源码解读
 ### 1、chan数据结构
 ```go
 type hchan struct {
@@ -70,6 +70,8 @@ type waitq struct {
 }
 ```
 
+例如，创建一个容量为 6 的，元素为 int 型的 channel 数据结构如下 ：
+![enter image description here](https://static.sitestack.cn/projects/qcrao-Go-Questions/47e89d2a3dd43e867b808a10576c8271.png)
 编译器处理完之后，chan的读取在go中入口是下面两个函数：
 ```go
 // 读取的数据放在elem里面，两种读取的方式，第一种直接返回值，第二种返回一个bool值，判断chan是否关闭
@@ -211,5 +213,5 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4MjA0NDU3MF19
+eyJoaXN0b3J5IjpbMTMwMzEyNjEwNywtMTgyMDQ0NTcwXX0=
 -->
