@@ -288,18 +288,10 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 	mysg.c = c
 	gp.waiting = mysg
 	gp.param = nil
-	// 构造sudog放入发送者
+	// 构造sudog放入发送者队列
 	c.sendq.enqueue(mysg)
-	// Signal to anyone trying to shrink our stack that we're about
-	// to park on a channel. The window between when this G's status
-	// changes and when we set gp.activeStackChans is not safe for
-	// stack shrinking.
 	atomic.Store8(&gp.parkingOnChan, 1)
 	gopark(chanparkcommit, unsafe.Pointer(&c.lock), waitReasonChanSend, traceEvGoBlockSend, 2)
-	// Ensure the value being sent is kept alive until the
-	// receiver copies it out. The sudog has a pointer to the
-	// stack object, but sudogs aren't considered as roots of the
-	// stack tracer.
 	KeepAlive(ep)
 
 	// someone woke us up.
@@ -328,6 +320,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIxMjkwMzA2NTIsLTM0NDU2NTYwMywxMj
-M1NzA3MjA2XX0=
+eyJoaXN0b3J5IjpbMTAxNjU1ODA3NSwtMzQ0NTY1NjAzLDEyMz
+U3MDcyMDZdfQ==
 -->
