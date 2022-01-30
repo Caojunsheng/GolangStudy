@@ -117,7 +117,8 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	}
 
 	if sg := c.sendq.dequeue(); sg != nil {
-		// 如果sender中有等待发送，且缓存为空，则直接从sender中接收值，否则的话，从队列的头部接收值
+		// 如果sender中有等待发送，那么可以分为两种情况
+		// 1、非缓冲队列且缓存为空，则直接从sender中接收值，否则的话，从队列的头部接收值
 		recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
 		return true, true
 	}
@@ -205,5 +206,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTkzNTY2NDM0XX0=
+eyJoaXN0b3J5IjpbLTExMzc2OTM3MTVdfQ==
 -->
