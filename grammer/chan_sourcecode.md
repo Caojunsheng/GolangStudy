@@ -79,20 +79,8 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 
 	// 如果是非阻塞且chan是空的
 	if !block && empty(c) {
-		// After observing that the channel is not ready for receiving, we observe whether the
-		// channel is closed.
-		//
-		// Reordering of these checks could lead to incorrect behavior when racing with a close.
-		// For example, if the channel was open and not empty, was closed, and then drained,
-		// reordered reads could incorrectly indicate "open and empty". To prevent reordering,
-		// we use atomic loads for both checks, and rely on emptying and closing to happen in
-		// separate critical sections under the same lock.  This assumption fails when closing
-		// an unbuffered channel with a blocked send, but that is an error condition anyway.
+		
 		if atomic.Load(&c.closed) == 0 {
-			// Because a channel cannot be reopened, the later observation of the channel
-			// being not closed implies that it was also not closed at the moment of the
-			// first observation. We behave as if we observed the channel at that moment
-			// and report that the receive cannot proceed.
 			return
 		}
 		// The channel is irreversibly closed. Re-check whether the channel has any pending data
@@ -203,7 +191,9 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 
 ```
 empty源码分析
-1、如果是非缓冲型，且sendq中无goroutine
+ 1. 如果是非缓冲型，且sendq中无goroutine
+
+ 2. 缓冲型，但是buf里面没有元素
 
 ```go
 func empty(c *hchan) bool {
@@ -218,5 +208,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTMwMTU4Nzc4M119
+eyJoaXN0b3J5IjpbLTU2NDgzOTM0MV19
 -->
