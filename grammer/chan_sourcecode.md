@@ -249,18 +249,20 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 		return true
 	}
 
-    // 如果缓冲的c
+    // 如果缓冲的chan，还有空间，将发送的数据拷贝到buffer中
 	if c.qcount < c.dataqsiz {
-		// Space is available in the channel buffer. Enqueue the element to send.
 		qp := chanbuf(c, c.sendx)
 		if raceenabled {
 			racenotify(c, c.sendx, nil)
 		}
 		typedmemmove(c.elemtype, qp, ep)
+		// 发送游标+1
 		c.sendx++
+		// 发送游标已经到末尾了，重新移到队头
 		if c.sendx == c.dataqsiz {
 			c.sendx = 0
 		}
+		// huanc数量+1
 		c.qcount++
 		unlock(&c.lock)
 		return true
@@ -326,6 +328,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTM5NzU5OTA2LC0zNDQ1NjU2MDMsMTIzNT
-cwNzIwNl19
+eyJoaXN0b3J5IjpbLTkyNzIxMzI4OCwtMzQ0NTY1NjAzLDEyMz
+U3MDcyMDZdfQ==
 -->
