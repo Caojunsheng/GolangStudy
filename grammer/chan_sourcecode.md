@@ -201,6 +201,11 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	return true, success
 }
 
+```
+empty源码分析
+1、如果是非缓冲型，且sendq中无goroutine
+
+```go
 func empty(c *hchan) bool {
 	// c.dataqsiz is immutable.
 	if c.dataqsiz == 0 {
@@ -213,5 +218,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTI4NjM0MzI1NF19
+eyJoaXN0b3J5IjpbLTMwMTU4Nzc4M119
 -->
