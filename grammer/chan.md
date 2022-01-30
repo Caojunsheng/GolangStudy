@@ -65,7 +65,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
       if !block {  
          return  
   }  
-      // 阻塞调用，
+      // 阻塞调用，一直等待接收nil的chan，goroutine挂起
       gopark(nil, nil, waitReasonChanReceiveNilChan, traceEvGoStop, 2)  
       throw("unreachable")  
    }  
@@ -175,6 +175,6 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0NjkxMTE4OTgsMzc5NTMzNTgsLTE2Mz
+eyJoaXN0b3J5IjpbLTE2MDE4NDkxOTksMzc5NTMzNTgsLTE2Mz
 IxMzM3MzBdfQ==
 -->
