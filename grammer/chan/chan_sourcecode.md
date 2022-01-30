@@ -358,7 +358,7 @@ func full(c *hchan) bool {
 }
 ```
 
-
+### 4、chan关闭流程
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTUyNTE4MDZdfQ==
+eyJoaXN0b3J5IjpbMTY1NjQ5MTI2MiwxNTI1MTgwNl19
 -->
