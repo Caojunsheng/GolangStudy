@@ -36,14 +36,14 @@ func closechan(c *hchan) {
 
 编译器处理完之后，chan的读取在go中入口是下面两个函数：
 ```go
-1.  `func chanrecv1(c *hchan, elem unsafe.Pointer)  {`
-2.  `chanrecv(c, elem,  true)`
-3.  `}`
-
-5.  `func chanrecv2(c *hchan, elem unsafe.Pointer)  (received bool)  {`
-6.  `_, received = chanrecv(c, elem,  true)`
-7.  `return`
-8.  `}`
+// 读取的数据放在elem里面，两种读取的方式，diyizhong
+func chanrecv1(c *hchan, elem unsafe.Pointer) {
+    chanrecv(c, elem, true)
+}
+func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
+    _, received = chanrecv(c, elem, true)
+    return
+}
 ```
 ```go
 // chanrecv receives on channel c and writes the received data to ep.// ep may be nil, in which case received data is ignored.  
@@ -170,6 +170,6 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3MjEzMzc3MTEsMzc5NTMzNTgsLTE2Mz
-IxMzM3MzBdfQ==
+eyJoaXN0b3J5IjpbLTE4MDMyNzIzOCwzNzk1MzM1OCwtMTYzMj
+EzMzczMF19
 -->
