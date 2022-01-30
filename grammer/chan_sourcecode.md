@@ -249,6 +249,7 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 		return true
 	}
 
+    // 如果缓冲的c
 	if c.qcount < c.dataqsiz {
 		// Space is available in the channel buffer. Enqueue the element to send.
 		qp := chanbuf(c, c.sendx)
@@ -325,6 +326,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTg5OTQzMzg4MiwtMzQ0NTY1NjAzLDEyMz
-U3MDcyMDZdfQ==
+eyJoaXN0b3J5IjpbLTM5NzU5OTA2LC0zNDQ1NjU2MDMsMTIzNT
+cwNzIwNl19
 -->
