@@ -79,13 +79,12 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 
 	// 如果是非阻塞且chan是空的
 	if !block && empty(c) {
-		
+	    // 如果chan是未关闭的，直接返回false,false
 		if atomic.Load(&c.closed) == 0 {
 			return
 		}
-		// The channel is irreversibly closed. Re-check whether the channel has any pending data
-		// to receive, which could have arrived between the empty and closed checks above.
-		// Sequential consistency is also required here, when racing with such a send.
+		
+		
 		if empty(c) {
 			// The channel is irreversibly closed and empty.
 			if raceenabled {
@@ -208,5 +207,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTU2NDgzOTM0MV19
+eyJoaXN0b3J5IjpbLTEwNDExMDc0NjZdfQ==
 -->
