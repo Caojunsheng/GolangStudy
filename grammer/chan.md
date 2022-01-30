@@ -59,10 +59,13 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
       print("chanrecv: chan=", c, "\n")  
    }  
   
-   if c == nil {  
+  // 如果chan是nil的话
+   if c == nil {
+      // 非阻塞调用，则直接返回false, false  
       if !block {  
          return  
   }  
+      // 阻塞调用，
       gopark(nil, nil, waitReasonChanReceiveNilChan, traceEvGoStop, 2)  
       throw("unreachable")  
    }  
@@ -172,6 +175,6 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE2NDA4NjkxNywzNzk1MzM1OCwtMTYzMj
-EzMzczMF19
+eyJoaXN0b3J5IjpbLTE0NjkxMTE4OTgsMzc5NTMzNTgsLTE2Mz
+IxMzM3MzBdfQ==
 -->
