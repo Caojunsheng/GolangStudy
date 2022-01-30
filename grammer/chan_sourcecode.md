@@ -83,7 +83,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		if atomic.Load(&c.closed) == 0 {
 			return
 		}
-		// chan已经关闭，并且
+		// chan已经关闭，并且为空
 		if empty(c) {
 			// The channel is irreversibly closed and empty.
 			if raceenabled {
@@ -206,5 +206,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMzMzMjI3NTQzXX0=
+eyJoaXN0b3J5IjpbLTYwMjY0NjYzM119
 -->
