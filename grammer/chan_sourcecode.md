@@ -104,7 +104,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	}
 
 	lock(&c.lock)
-    // 
+    // chan已经关闭，且缓存中无数据，直接返回该类型的零值
 	if c.closed != 0 && c.qcount == 0 {
 		if raceenabled {
 			raceacquire(c.raceaddr())
@@ -117,10 +117,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	}
 
 	if sg := c.sendq.dequeue(); sg != nil {
-		// Found a waiting sender. If buffer is size 0, receive value
-		// directly from sender. Otherwise, receive from head of queue
-		// and add sender's value to the tail of the queue (both map to
-		// the same buffer slot because the queue is full).
+		// 如果senderd
 		recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
 		return true, true
 	}
@@ -208,5 +205,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNDI5NDMwNDJdfQ==
+eyJoaXN0b3J5IjpbMTk3NzQ5MzY1NV19
 -->
