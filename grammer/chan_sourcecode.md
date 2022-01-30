@@ -244,7 +244,7 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 	}
 
 	if sg := c.recvq.dequeue(); sg != nil {
-		// 如果有接受者在等待，直接
+		// 如果有接受者在等待，直接将发送的数据拷贝到
 		send(c, sg, ep, func() { unlock(&c.lock) }, 3)
 		return true
 	}
@@ -325,6 +325,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTI1OTg2MjY4LC0zNDQ1NjU2MDMsMTIzNT
-cwNzIwNl19
+eyJoaXN0b3J5IjpbLTg5OTQzMzg4MiwtMzQ0NTY1NjAzLDEyMz
+U3MDcyMDZdfQ==
 -->
