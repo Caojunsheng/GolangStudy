@@ -96,28 +96,11 @@ func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
 `chanrecv1`不返回ok，`chanrecv2`返回ok，两个最终都是调用`chanrecv`函数
 ```go
 // src/runtime/chan.go:454
-// chanrecv receives on channel c and writes the received data to ep.// ep may be nil, in which case received data is ignored.  
-// If block == false and no elements are available, returns (false, false).// Otherwise, if c is closed, zeros *ep and returns (true, false).  
-// Otherwise, fills in *ep with an element and returns (true, true).  
-// A non-nil ep must point to the heap or the caller's stack.  
-func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool) {  
-   ...
-  
-  // 如果chan是nil的话
-   if c == nil {
-      // 非阻塞调用，则直接返回false, false  
-      if !block {  
-         return  
-  }  
-      // 阻塞调用，一直等待接收nil的chan，goroutine挂起
-      gopark(nil, nil, waitReasonChanReceiveNilChan, traceEvGoStop, 2)  
-      throw("unreachable")  
-   }  
-  
 func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool) {
 	...
-
+    // 如果chan是nil的话
 	if c == nil {
+	    // 非阻塞调用，则直接返回false, false 
 		if !block {
 			return
 		}
@@ -251,5 +234,5 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4NzcxMTkwMjUsLTE4MjA0NDU3MF19
+eyJoaXN0b3J5IjpbMjM3ODMzMTAzLC0xODIwNDQ1NzBdfQ==
 -->
