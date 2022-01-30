@@ -316,6 +316,36 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 	return true
 }
 ```
+send源码
+```go
+// send 函数处理向一个空的 channel 发送操作
+// ep 指向被发送的元素，会被直接拷贝到接收的 goroutine
+// 之后，接收的 goroutine 会被唤醒
+// c 必须是空的（因为等待队列里有 goroutine，肯定是空的）
+// c 必须被上锁，发送操作执行完后，会使用 unlockf 函数解锁
+// sg 必须已经从等待队列里取出来了
+// ep 必须是非空，并且它指向堆或调用者的栈
+func send(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
+    // 省略一些用不到的
+    // ……
+    // sg.elem 指向接收到的值存放的位置，如 val <- ch，指的就是 &val
+    if sg.elem != nil {
+        // 直接拷贝内存（从发送者到接收者）
+        sendDirect(c.elemtype, sg, ep)
+        sg.elem = nil
+    }
+    // sudog 上绑定的 goroutine
+    gp := sg.g
+    // 解锁
+    unlockf()
+    gp.param = unsafe.Pointer(sg)
+    if sg.releasetime != 0 {
+        sg.releasetime = cputicks()
+    }
+    // 唤醒接收的 goroutine. skip 和打印栈相关，暂时不理会
+    goready(gp, skip+1)
+}
+```
 full源码
 ```go
 func full(c *hchan) bool {
@@ -330,6 +360,6 @@ func full(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTQzNDY4MjkwMCwxMDE2NTU4MDc1LC0zND
-Q1NjU2MDMsMTIzNTcwNzIwNl19
+eyJoaXN0b3J5IjpbMTUyNTE4MDYsMTAxNjU1ODA3NSwtMzQ0NT
+Y1NjAzLDEyMzU3MDcyMDZdfQ==
 -->
