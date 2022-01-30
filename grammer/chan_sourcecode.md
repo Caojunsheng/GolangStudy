@@ -151,20 +151,19 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	}
 
 	if !block {
-	    // 非阻塞接收，解锁
+	    // 非阻塞接收，解锁，返回false,false
 		unlock(&c.lock)
 		return false, false
 	}
 
-	// no sender available: block on this channel.
+	// 无发送者，这个接收值需要被阻塞.
 	gp := getg()
 	mysg := acquireSudog()
 	mysg.releasetime = 0
 	if t0 != 0 {
 		mysg.releasetime = -1
 	}
-	// No stack splits between assigning elem and enqueuing mysg
-	// on gp.waiting where copystack can find it.
+	// 构造一个接收数据的sudo.
 	mysg.elem = ep
 	mysg.waitlink = nil
 	gp.waiting = mysg
@@ -215,5 +214,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODg1OTkwMDA3LDEyMzU3MDcyMDZdfQ==
+eyJoaXN0b3J5IjpbLTY2NTAxMzE5MiwxMjM1NzA3MjA2XX0=
 -->
