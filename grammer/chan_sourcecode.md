@@ -124,12 +124,14 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		return true, true
 	}
 
+    // 缓冲型chan，buf里面有元素，直接从buf里面拿
 	if c.qcount > 0 {
 		// Receive directly from queue
 		qp := chanbuf(c, c.recvx)
 		if raceenabled {
 			racenotify(c, c.recvx, nil)
 		}
+		// 代码里面需要接收值，则需要拷贝值，比如接收是`val<-ch`，eri
 		if ep != nil {
 			typedmemmove(c.elemtype, ep, qp)
 		}
@@ -207,5 +209,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTIzNTcwNzIwNl19
+eyJoaXN0b3J5IjpbMTgxNjE2NzAzLDEyMzU3MDcyMDZdfQ==
 -->
