@@ -83,13 +83,14 @@ type waitq struct {
 ### 2、chan读取源码分析
 chan的读取源码入口是如下两个函数：
 ```go
-// 读取的数据放在elem里面，两种读取的方式，第一种直接返回值，第二种返回一个bool值，判断chan是否关闭
-func chanrecv1(c *hchan, elem unsafe.Pointer) {
-    chanrecv(c, elem, true)
-}
-func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
-    _, received = chanrecv(c, elem, true)
-    return
+// 读取的数据放在elem里面，两种读取的方式，第一种直接返回值，第二种返回一个bool值，判断chan是否关闭 
+func chanrecv1(c *hchan, elem unsafe.Pointer) {  
+   chanrecv(c, elem, true)  
+}  
+
+func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {  
+   _, received = chanrecv(c, elem, true)  
+   return  
 }
 ```
 `chanrecv1`不返回ok，`chanrecv2`返回ok，两个最终都是调用`chanrecv`函数
@@ -100,11 +101,7 @@ func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
 // Otherwise, fills in *ep with an element and returns (true, true).  
 // A non-nil ep must point to the heap or the caller's stack.  
 func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool) {  
-   // raceenabled: don't need to check ep, as it is always on the stack  
- // or is new memory allocated by reflect.  
-  if debugChan {  
-      print("chanrecv: chan=", c, "\n")  
-   }  
+   ...
   
   // 如果chan是nil的话
    if c == nil {
@@ -117,110 +114,142 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
       throw("unreachable")  
    }  
   
-   // Fast path: check for failed non-blocking operation without acquiring the lock.  
-  if !block && empty(c) {  
-      // After observing that the channel is not ready for receiving, we observe whether the  
- // channel is closed. // // Reordering of these checks could lead to incorrect behavior when racing with a close. // For example, if the channel was open and not empty, was closed, and then drained, // reordered reads could incorrectly indicate "open and empty". To prevent reordering, // we use atomic loads for both checks, and rely on emptying and closing to happen in // separate critical sections under the same lock.  This assumption fails when closing // an unbuffered channel with a blocked send, but that is an error condition anyway.  if atomic.Load(&c.closed) == 0 {  
-         // Because a channel cannot be reopened, the later observation of the channel  
- // being not closed implies that it was also not closed at the moment of the // first observation. We behave as if we observed the channel at that moment // and report that the receive cannot proceed.  return  
-  }  
-      // The channel is irreversibly closed. Re-check whether the channel has any pending data  
- // to receive, which could have arrived between the empty and closed checks above. // Sequential consistency is also required here, when racing with such a send.  if empty(c) {  
-         // The channel is irreversibly closed and empty.  
-  if raceenabled {  
-            raceacquire(c.raceaddr())  
-         }  
-         if ep != nil {  
-            typedmemclr(c.elemtype, ep)  
-         }  
-         return true, false  
-  }  
-   }  
-  
-   var t0 int64  
- if blockprofilerate > 0 {  
-      t0 = cputicks()  
-   }  
-  
-   lock(&c.lock)  
-  
-   if c.closed != 0 && c.qcount == 0 {  
-      if raceenabled {  
-         raceacquire(c.raceaddr())  
-      }  
-      unlock(&c.lock)  
-      if ep != nil {  
-         typedmemclr(c.elemtype, ep)  
-      }  
-      return true, false  
-  }  
-  
-   if sg := c.sendq.dequeue(); sg != nil {  
-      // Found a waiting sender. If buffer is size 0, receive value  
- // directly from sender. Otherwise, receive from head of queue // and add sender's value to the tail of the queue (both map to // the same buffer slot because the queue is full).  recv(c, sg, ep, func() { unlock(&c.lock) }, 3)  
-      return true, true  
-  }  
-  
-   if c.qcount > 0 {  
-      // Receive directly from queue  
-  qp := chanbuf(c, c.recvx)  
-      if raceenabled {  
-         racenotify(c, c.recvx, nil)  
-      }  
-      if ep != nil {  
-         typedmemmove(c.elemtype, ep, qp)  
-      }  
-      typedmemclr(c.elemtype, qp)  
-      c.recvx++  
-      if c.recvx == c.dataqsiz {  
-         c.recvx = 0  
-  }  
-      c.qcount--  
-      unlock(&c.lock)  
-      return true, true  
-  }  
-  
-   if !block {  
-      unlock(&c.lock)  
-      return false, false  
-  }  
-  
-   // no sender available: block on this channel.  
-  gp := getg()  
-   mysg := acquireSudog()  
-   mysg.releasetime = 0  
-  if t0 != 0 {  
-      mysg.releasetime = -1  
-  }  
-   // No stack splits between assigning elem and enqueuing mysg  
- // on gp.waiting where copystack can find it.  mysg.elem = ep  
-  mysg.waitlink = nil  
-  gp.waiting = mysg  
- mysg.g = gp  
- mysg.isSelect = false  
-  mysg.c = c  
-  gp.param = nil  
-  c.recvq.enqueue(mysg)  
-   // Signal to anyone trying to shrink our stack that we're about  
- // to park on a channel. The window between when this G's status // changes and when we set gp.activeStackChans is not safe for // stack shrinking.  atomic.Store8(&gp.parkingOnChan, 1)  
-   gopark(chanparkcommit, unsafe.Pointer(&c.lock), waitReasonChanReceive, traceEvGoBlockRecv, 2)  
-  
-   // someone woke us up  
-  if mysg != gp.waiting {  
-      throw("G waiting list is corrupted")  
-   }  
-   gp.waiting = nil  
-  gp.activeStackChans = false  
- if mysg.releasetime > 0 {  
-      blockevent(mysg.releasetime-t0, 2)  
-   }  
-   success := mysg.success  
-  gp.param = nil  
-  mysg.c = nil  
-  releaseSudog(mysg)  
-   return true, success  
+func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool) {
+	...
+
+	if c == nil {
+		if !block {
+			return
+		}
+		// 阻塞调用，一直等待接收nil的chan，goroutine挂起
+		gopark(nil, nil, waitReasonChanReceiveNilChan, traceEvGoStop, 2)
+		throw("unreachable")
+	}
+
+	// Fast path: check for failed non-blocking operation without acquiring the lock.
+	if !block && empty(c) {
+		// After observing that the channel is not ready for receiving, we observe whether the
+		// channel is closed.
+		//
+		// Reordering of these checks could lead to incorrect behavior when racing with a close.
+		// For example, if the channel was open and not empty, was closed, and then drained,
+		// reordered reads could incorrectly indicate "open and empty". To prevent reordering,
+		// we use atomic loads for both checks, and rely on emptying and closing to happen in
+		// separate critical sections under the same lock.  This assumption fails when closing
+		// an unbuffered channel with a blocked send, but that is an error condition anyway.
+		if atomic.Load(&c.closed) == 0 {
+			// Because a channel cannot be reopened, the later observation of the channel
+			// being not closed implies that it was also not closed at the moment of the
+			// first observation. We behave as if we observed the channel at that moment
+			// and report that the receive cannot proceed.
+			return
+		}
+		// The channel is irreversibly closed. Re-check whether the channel has any pending data
+		// to receive, which could have arrived between the empty and closed checks above.
+		// Sequential consistency is also required here, when racing with such a send.
+		if empty(c) {
+			// The channel is irreversibly closed and empty.
+			if raceenabled {
+				raceacquire(c.raceaddr())
+			}
+			if ep != nil {
+				typedmemclr(c.elemtype, ep)
+			}
+			return true, false
+		}
+	}
+
+	var t0 int64
+	if blockprofilerate > 0 {
+		t0 = cputicks()
+	}
+
+	lock(&c.lock)
+
+	if c.closed != 0 && c.qcount == 0 {
+		if raceenabled {
+			raceacquire(c.raceaddr())
+		}
+		unlock(&c.lock)
+		if ep != nil {
+			typedmemclr(c.elemtype, ep)
+		}
+		return true, false
+	}
+
+	if sg := c.sendq.dequeue(); sg != nil {
+		// Found a waiting sender. If buffer is size 0, receive value
+		// directly from sender. Otherwise, receive from head of queue
+		// and add sender's value to the tail of the queue (both map to
+		// the same buffer slot because the queue is full).
+		recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
+		return true, true
+	}
+
+	if c.qcount > 0 {
+		// Receive directly from queue
+		qp := chanbuf(c, c.recvx)
+		if raceenabled {
+			racenotify(c, c.recvx, nil)
+		}
+		if ep != nil {
+			typedmemmove(c.elemtype, ep, qp)
+		}
+		typedmemclr(c.elemtype, qp)
+		c.recvx++
+		if c.recvx == c.dataqsiz {
+			c.recvx = 0
+		}
+		c.qcount--
+		unlock(&c.lock)
+		return true, true
+	}
+
+	if !block {
+		unlock(&c.lock)
+		return false, false
+	}
+
+	// no sender available: block on this channel.
+	gp := getg()
+	mysg := acquireSudog()
+	mysg.releasetime = 0
+	if t0 != 0 {
+		mysg.releasetime = -1
+	}
+	// No stack splits between assigning elem and enqueuing mysg
+	// on gp.waiting where copystack can find it.
+	mysg.elem = ep
+	mysg.waitlink = nil
+	gp.waiting = mysg
+	mysg.g = gp
+	mysg.isSelect = false
+	mysg.c = c
+	gp.param = nil
+	c.recvq.enqueue(mysg)
+	// Signal to anyone trying to shrink our stack that we're about
+	// to park on a channel. The window between when this G's status
+	// changes and when we set gp.activeStackChans is not safe for
+	// stack shrinking.
+	atomic.Store8(&gp.parkingOnChan, 1)
+	gopark(chanparkcommit, unsafe.Pointer(&c.lock), waitReasonChanReceive, traceEvGoBlockRecv, 2)
+
+	// someone woke us up
+	if mysg != gp.waiting {
+		throw("G waiting list is corrupted")
+	}
+	gp.waiting = nil
+	gp.activeStackChans = false
+	if mysg.releasetime > 0 {
+		blockevent(mysg.releasetime-t0, 2)
+	}
+	success := mysg.success
+	gp.param = nil
+	mysg.c = nil
+	releaseSudog(mysg)
+	return true, success
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTAwMzA5MzQ2NywtMTgyMDQ0NTcwXX0=
+eyJoaXN0b3J5IjpbLTE4NzcxMTkwMjUsLTE4MjA0NDU3MF19
 -->
