@@ -64,6 +64,10 @@ type hchan struct {
     // 保护 hchan 中所有字段
     lock mutex
 }
+type waitq struct {  
+   first *sudog  
+   last *sudog  
+}
 ```
 
 编译器处理完之后，chan的读取在go中入口是下面两个函数：
@@ -207,6 +211,6 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTQyMjA4ODEzNSwzNzk1MzM1OCwtMTYzMj
+eyJoaXN0b3J5IjpbLTE4MjA0NDU3MCwzNzk1MzM1OCwtMTYzMj
 EzMzczMF19
 -->
