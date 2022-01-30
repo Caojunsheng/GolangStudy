@@ -11,8 +11,8 @@ if c.closed != 0 {
 ```
 ### 2、关闭chan
 
--   关闭nil的channel，会panic
--   对已关闭的channel，再次关闭channel，会panic
+-   关闭nil的chan，会panic
+-   对已关闭的chan，再次关闭chan，会panic
 
 ```go
 // src/runtime/chan.go:355
@@ -29,10 +29,10 @@ func closechan(c *hchan) {
    ...
 }
 ```
-### 3、读channel数据
+### 3、读chan数据
 
--   channel关闭之后，关闭前放入的数据，仍然可以读取
--   已关闭的channel仍然可以读取，值为零值，返回值ok为false
+-   chan关闭之后，关闭前放入的数据，仍然可以读取
+-   已关闭的chan仍然可以读取，值为零值，返回值ok为false
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzY4MTM5Njg2XX0=
+eyJoaXN0b3J5IjpbLTE2MzIxMzM3MzBdfQ==
 -->
