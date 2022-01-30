@@ -96,6 +96,12 @@ func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
 `chanrecv1`不返回ok，`chanrecv2`返回ok，两个最终都是调用`chanrecv`函数
 ```go
 // src/runtime/chan.go:454
+// chanrecv 函数接收 channel c 的元素并将其写入 ep 所指向的内存地址。
+// 如果 ep 是 nil，说明忽略了接收值。
+// 如果 block == false，即非阻塞型接收，在没有数据可接收的情况下，返回 (false, false)
+// 否则，如果 c 处于关闭状态，将 ep 指向的地址清零，返回 (true, false)
+// 否则，用返回值填充 ep 指向的内存地址。返回 (true, true)
+// 如果 ep 非空，则应该指向堆或者函数调用者的栈
 func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool) {
 	...
     // 如果chan是nil的话
@@ -234,5 +240,5 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjM3ODMzMTAzLC0xODIwNDQ1NzBdfQ==
+eyJoaXN0b3J5IjpbMTgxNTY3NTg3MCwtMTgyMDQ0NTcwXX0=
 -->
