@@ -139,16 +139,19 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		typedmemclr(c.elemtype, qp)
 		// 接收index+1
 		c.recvx++
-		// 如果接收索引已经dao
+		// 如果接收索引已经到末尾，重新移到队首
 		if c.recvx == c.dataqsiz {
 			c.recvx = 0
 		}
+		// 缓冲区大小减一
 		c.qcount--
+		// 解锁
 		unlock(&c.lock)
 		return true, true
 	}
 
 	if !block {
+	    // 非阻塞接收，解锁
 		unlock(&c.lock)
 		return false, false
 	}
@@ -212,5 +215,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExNzMzOTEyMDEsMTIzNTcwNzIwNl19
+eyJoaXN0b3J5IjpbODg1OTkwMDA3LDEyMzU3MDcyMDZdfQ==
 -->
