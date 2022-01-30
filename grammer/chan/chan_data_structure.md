@@ -44,9 +44,6 @@ type waitq struct {
 
 
 
-
-
-### 4、chan关闭流程
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjg2Nzk1OTk5XX0=
+eyJoaXN0b3J5IjpbNTM5OTA2NzQxXX0=
 -->
