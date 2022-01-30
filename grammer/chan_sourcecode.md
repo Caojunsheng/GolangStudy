@@ -131,12 +131,15 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		if raceenabled {
 			racenotify(c, c.recvx, nil)
 		}
-		// 代码里面需要接收值，则需要拷贝值，比如接收是`val<-ch`，eri
+		// 代码里面需要接收值，则需要拷贝值，比如接收是`val<-ch`，而不是`<-ch`，需要把chan的值拷贝到val
 		if ep != nil {
 			typedmemmove(c.elemtype, ep, qp)
 		}
+		// 清空掉原来buf中对应位置的值
 		typedmemclr(c.elemtype, qp)
+		// 接收index+1
 		c.recvx++
+		// 如果接收索引已经dao
 		if c.recvx == c.dataqsiz {
 			c.recvx = 0
 		}
@@ -209,5 +212,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTgxNjE2NzAzLDEyMzU3MDcyMDZdfQ==
+eyJoaXN0b3J5IjpbLTExNzMzOTEyMDEsMTIzNTcwNzIwNl19
 -->
