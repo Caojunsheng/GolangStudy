@@ -163,7 +163,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	if t0 != 0 {
 		mysg.releasetime = -1
 	}
-	// 构造一个接收数据的sudo.
+	// 构造一个接收数据的sudog.
 	mysg.elem = ep
 	mysg.waitlink = nil
 	gp.waiting = mysg
@@ -171,11 +171,9 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 	mysg.isSelect = false
 	mysg.c = c
 	gp.param = nil
+	// 放入接受者队列中
 	c.recvq.enqueue(mysg)
-	// Signal to anyone trying to shrink our stack that we're about
-	// to park on a channel. The window between when this G's status
-	// changes and when we set gp.activeStackChans is not safe for
-	// stack shrinking.
+	// 将goroutine挂起
 	atomic.Store8(&gp.parkingOnChan, 1)
 	gopark(chanparkcommit, unsafe.Pointer(&c.lock), waitReasonChanReceive, traceEvGoBlockRecv, 2)
 
@@ -214,5 +212,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTY2NTAxMzE5MiwxMjM1NzA3MjA2XX0=
+eyJoaXN0b3J5IjpbLTM0NDU2NTYwMywxMjM1NzA3MjA2XX0=
 -->
