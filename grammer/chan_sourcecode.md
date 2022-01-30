@@ -209,8 +209,12 @@ func empty(c *hchan) bool {
 }
 ```
 
+### 3、chan写入源码分析
+
+
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTM0NDU2NTYwMywxMjM1NzA3MjA2XX0=
+eyJoaXN0b3J5IjpbLTc2NzA3Mzk4MSwtMzQ0NTY1NjAzLDEyMz
+U3MDcyMDZdfQ==
 -->
