@@ -92,6 +92,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 			if ep != nil {
 				typedmemclr(c.elemtype, ep)
 			}
+			
 			return true, false
 		}
 	}
@@ -206,5 +207,5 @@ func empty(c *hchan) bool {
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTYwMjY0NjYzM119
+eyJoaXN0b3J5IjpbLTc2MTAyMDQzMV19
 -->
