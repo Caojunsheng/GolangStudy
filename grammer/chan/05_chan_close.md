@@ -30,6 +30,7 @@ func closechan(c *hchan) {
 		if sg == nil {
 			break
 		}
+		// 赋值零值
 		if sg.elem != nil {
 			typedmemclr(c.elemtype, sg.elem)
 			sg.elem = nil
@@ -52,6 +53,7 @@ func closechan(c *hchan) {
 		if sg == nil {
 			break
 		}
+		// 发送者会panic
 		sg.elem = nil
 		if sg.releasetime != 0 {
 			sg.releasetime = cputicks()
@@ -75,5 +77,5 @@ func closechan(c *hchan) {
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTYzNTAwMjg2OF19
+eyJoaXN0b3J5IjpbLTE0OTIwMDM0NjldfQ==
 -->
