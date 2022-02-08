@@ -3,12 +3,14 @@
 ```go
 func closechan(c *hchan) {  
    if c == nil {  
+      // 关闭空的chan直接panic
       panic(plainError("close of nil channel"))  
    }  
   
    lock(&c.lock)  
    if c.closed != 0 {  
       unlock(&c.lock)  
+      // 关闭已关闭的chan直接panic
       panic(plainError("close of closed channel"))  
    }  
   
@@ -17,7 +19,7 @@ func closechan(c *hchan) {
       racewritepc(c.raceaddr(), callerpc, funcPC(closechan))  
       racerelease(c.raceaddr())  
    }  
-  
+   //标志位打上
    c.closed = 1  
   
   var glist gList  
@@ -73,5 +75,6 @@ func closechan(c *hchan) {
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEzNDgxMTUyMzldfQ==
+eyJoaXN0b3J5IjpbLTExODQxMTM5MjksLTEzNDgxMTUyMzldfQ
+==
 -->
