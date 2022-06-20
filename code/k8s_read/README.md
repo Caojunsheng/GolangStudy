@@ -1,5 +1,5 @@
 ### 1、kubernetes panic堆栈打印
-```
+```go
 func HandlePanic(fn func()) func() {  
    return func() {  
       defer func() {  
@@ -38,6 +38,6 @@ func logPanic(r interface{}) {
 
 > Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4NTgyODA5NTIsLTE1MTAxMTU3MSw3Mz
-A5OTgxMTZdfQ==
+eyJoaXN0b3J5IjpbMTA2NTEwNjQwMCwtMTUxMDExNTcxLDczMD
+k5ODExNl19
 -->
