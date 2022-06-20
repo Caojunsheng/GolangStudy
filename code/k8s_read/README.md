@@ -1,4 +1,21 @@
 ### 1、kubernetes panic堆栈打印
+```
+func HandlePanic(fn func()) func() {  
+   return func() {  
+      defer func() {  
+         if r := recover(); r != nil {  
+            for _, fn := range utilruntime.PanicHandlers {  
+               fn(r)  
+            }  
+            panic(r)  
+         }  
+      }()  
+      // call the function  
+  fn()  
+   }  
+}
+```
+
 ```go
 func logPanic(r interface{}) {  
    if r == http.ErrAbortHandler {  
@@ -21,5 +38,6 @@ func logPanic(r interface{}) {
 
 > Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1MTAxMTU3MSw3MzA5OTgxMTZdfQ==
+eyJoaXN0b3J5IjpbLTE4NTgyODA5NTIsLTE1MTAxMTU3MSw3Mz
+A5OTgxMTZdfQ==
 -->
