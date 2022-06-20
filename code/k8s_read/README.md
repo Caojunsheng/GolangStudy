@@ -14,6 +14,9 @@ func HandlePanic(fn func()) func() {
   fn()  
    }  
 }
+
+// PanicHandlers is a list of functions which will be invoked when a panic happens.
+var PanicHandlers = []func(interface{}){logPanic}
 ```
 
 ```go
@@ -38,6 +41,6 @@ func logPanic(r interface{}) {
 
 > Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwOTU4NTA5OTYsLTE1MTAxMTU3MSw3Mz
-A5OTgxMTZdfQ==
+eyJoaXN0b3J5IjpbMTc4OTY3Njk1NywtMTUxMDExNTcxLDczMD
+k5ODExNl19
 -->
