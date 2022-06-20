@@ -10,7 +10,7 @@ func HandlePanic(fn func()) func() {
             panic(r)  
          }  
       }()  
-      // call the function  
+      // panic之前执行的操作
   fn()  
    }  
 }
@@ -38,6 +38,6 @@ func logPanic(r interface{}) {
 
 > Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTA2NTEwNjQwMCwtMTUxMDExNTcxLDczMD
-k5ODExNl19
+eyJoaXN0b3J5IjpbLTIwOTU4NTA5OTYsLTE1MTAxMTU3MSw3Mz
+A5OTgxMTZdfQ==
 -->
