@@ -67,3 +67,10 @@ git clone https://github.com/brendangregg/FlameGraph
 export PATH=$PATH:/path/FlameGraph
 go-torch --binaryname=./<code_binary> --binaryinput=./cpu.pprof
 ```
+### 4.golang使用analysis对代码静态检查
+```go
+
+```
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTEwMjM3NDk3NV19
+-->
