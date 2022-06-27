@@ -82,7 +82,7 @@ func main() {
   
 var Analyzer = &analysis.Analyzer{  
    Name: "smerror correct check",  
-  Doc:  "Checks that smerror first param type is Context",  
+  Doc:  "Checks that err has valid receiver name and method name",  
   Run:  run,  
 }  
   
@@ -211,5 +211,5 @@ func getIdentName(expr ast.Expr) string {
 }
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNTk3MDMwMzQxXX0=
+eyJoaXN0b3J5IjpbMjg0MjQzNDQzXX0=
 -->
