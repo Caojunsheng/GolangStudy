@@ -211,7 +211,7 @@ func getIdentName(expr ast.Expr) string {
 }
 ```
 
-### 5
+### 5.golang 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTMwNzQ0MDQ2MSwyODQyNDM0NDNdfQ==
+eyJoaXN0b3J5IjpbLTEzNDU1NDExOTksMjg0MjQzNDQzXX0=
 -->
