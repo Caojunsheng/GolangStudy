@@ -69,149 +69,156 @@ go-torch --binaryname=./<code_binary> --binaryinput=./cpu.pprof
 ```
 ### 4.golang使用analysis对代码静态检查
 ```go
-package main  
-  
-import (  
-   "go/ast"  
- "go/token" "strings"  
- "golang.org/x/tools/go/analysis" "golang.org/x/tools/go/analysis/singlechecker")  
-  
-func main() {  
-   singlechecker.Main(Analyzer)  
-}  
-  
-var Analyzer = &analysis.Analyzer{  
-   Name: "smerror correct check",  
-  Doc:  "Checks that err has valid receiver name and method name",  
-  Run:  run,  
-}  
-  
-func run(pass *analysis.Pass) (interface{}, error) {  
-   fileConstMap := make(map[string]string)  
-   inspect := func(node ast.Node) bool {  
-      switch delc := node.(type) {  
-      case *ast.GenDecl:  
-         if delc.Tok == token.CONST && len(delc.Specs) > 0 {  
-            for i := range delc.Specs {  
-               if valSpec, ok := delc.Specs[i].(*ast.ValueSpec); ok {  
-                  for j := range valSpec.Names {  
-                     if len(valSpec.Values) == len(valSpec.Names) {  
-                        if valueDefine, ok := valSpec.Values[j].(*ast.BasicLit); ok {  
-                           fileConstMap[valSpec.Names[j].Name] = strings.ReplaceAll(valueDefine.Value, "\"", "")  
-                        }  
-                     }  
-  
-                  }  
-               }  
-            }  
-         }  
-      case *ast.FuncDecl:  
-         var receiverName string  
- if delc.Recv != nil && len(delc.Recv.List) > 0 {  
-            if expr, ok := delc.Recv.List[0].Type.(*ast.StarExpr); ok {  
-               receiverName = getIdentName(expr.X)  
-            }  
-         }  
-         analysisFunErr(pass, delc, receiverName, fileConstMap)  
-      default:  
-         return true  
-  }  
-      return true  
-  }  
-  
-   for _, f := range pass.Files {  
-      ast.Inspect(f, inspect)  
-   }  
-   return nil, nil  
-}  
-  
-func analysisFunErr(pass *analysis.Pass, funcDecl *ast.FuncDecl, receiverName string, fileConstMap map[string]string) {  
-   results := funcDecl.Type.Results  
-  if results == nil || len(results.List) == 0 {  
-      return  
-  }  
-   returnErrFlag := false  
- for i := range results.List {  
-      if err, ok := results.List[i].Type.(*ast.Ident); ok && err.Name == "error" {  
-         returnErrFlag = true  
- break  }  
-   }  
-   if !returnErrFlag {  
-      return  
-  }  
-   mName := funcDecl.Name.Name  
-  constMap := make(map[string]string)  
-   for i := range funcDecl.Body.List {  
-      switch stmt := funcDecl.Body.List[i].(type) {  
-      case *ast.DeclStmt:  
-         if decl, ok := stmt.Decl.(*ast.GenDecl); ok && len(decl.Specs) > 0 {  
-            for i := range decl.Specs {  
-               if valSpec, ok := decl.Specs[i].(*ast.ValueSpec); ok && len(valSpec.Names) > 0 {  
-                  for j := range valSpec.Names {  
-                     if len(valSpec.Values) == len(valSpec.Names) {  
-                        if valueDefine, ok := valSpec.Values[j].(*ast.BasicLit); ok {  
-                           constMap[valSpec.Names[j].Name] = strings.ReplaceAll(valueDefine.Value, "\"", "")  
-                        }  
-                     }  
-                  }  
-               }  
-            }  
-         }  
-      case *ast.IfStmt:  
-         processIfStmt(pass, stmt, mName, receiverName, constMap, fileConstMap)  
-      case *ast.ReturnStmt:  
-         processReturnStmt(pass, stmt, mName, receiverName, constMap, fileConstMap)  
-      }  
-   }  
-}  
-  
-func processIfStmt(pass *analysis.Pass, stmt *ast.IfStmt, mName, receiverName string, constMap, fileConstMap map[string]string) {  
-   for i := range stmt.Body.List {  
-      switch newStmt := stmt.Body.List[i].(type) {  
-      case *ast.IfStmt:  
-         processIfStmt(pass, newStmt, mName, receiverName, constMap, fileConstMap)  
-      case *ast.ReturnStmt:  
-         processReturnStmt(pass, newStmt, mName, receiverName, constMap, fileConstMap)  
-      }  
-   }  
-}  
-  
-func processReturnStmt(pass *analysis.Pass, stmt *ast.ReturnStmt, mName, receiverName string, constMap, fileConstMap map[string]string) {  
-   for i := range stmt.Results {  
-      if smerrCall, ok := stmt.Results[i].(*ast.CallExpr); ok {  
-         if smerrNew, ok := smerrCall.Fun.(*ast.SelectorExpr); ok {  
-            if pkgName, ok := smerrNew.X.(*ast.Ident); ok && pkgName.Name == "smerror" {  
-               if smerrNew.Sel.Name == "New" {  
-                  if name, ok := fileConstMap[getIdentName(smerrCall.Args[0])]; ok && name != receiverName {  
-                     pass.Reportf(stmt.Pos(), "error.New use fault receiver name\n")  
-                  }  
-                  if name, ok := constMap[getIdentName(smerrCall.Args[1])]; ok && name != mName {  
-                     pass.Reportf(stmt.Pos(), "error.New use fault method name\n")  
-                  }  
-               } else if smerrNew.Sel.Name == "Wrap" {  
-                  if name, ok := fileConstMap[getIdentName(smerrCall.Args[1])]; ok && name != receiverName {  
-                     pass.Reportf(stmt.Pos(), "error.Wrap use fault receiver name\n")  
-                  }  
-                  if name, ok := constMap[getIdentName(smerrCall.Args[2])]; ok && name != mName {  
-                     pass.Reportf(stmt.Pos(), "error.Wrap use fault method name\n")  
-                  }  
-               }  
-  
-            }  
-         }  
-      }  
-   }  
-}  
-  
-func getIdentName(expr ast.Expr) string {  
-   if ident, ok := expr.(*ast.Ident); ok {  
-      return ident.Name  
-  }  
-   return ""  
+package main
+
+import (
+	"go/ast"
+	"go/token"
+	"strings"
+
+	"golang.org/x/tools/go/analysis"
+	"golang.org/x/tools/go/analysis/singlechecker"
+)
+
+func main() {
+	singlechecker.Main(Analyzer)
 }
+
+var Analyzer = &analysis.Analyzer{
+	Name: "firstparamcontext",
+	Doc:  "Checks that functions first param type is Context",
+	Run:  run,
+}
+
+func run(pass *analysis.Pass) (interface{}, error) {
+	fileConstMap := make(map[string]string)
+	inspect := func(node ast.Node) bool {
+		switch delc := node.(type) {
+		case *ast.GenDecl:
+			if delc.Tok == token.CONST && len(delc.Specs) > 0 {
+				for i := range delc.Specs {
+					if valSpec, ok := delc.Specs[i].(*ast.ValueSpec); ok {
+						for j := range valSpec.Names {
+							if len(valSpec.Values) == len(valSpec.Names) {
+								if valueDefine, ok := valSpec.Values[j].(*ast.BasicLit); ok {
+									fileConstMap[valSpec.Names[j].Name] = strings.ReplaceAll(valueDefine.Value, "\"", "")
+								}
+							}
+
+						}
+					}
+				}
+			}
+		case *ast.FuncDecl:
+			var receiverName string
+			if delc.Recv != nil && len(delc.Recv.List) > 0 {
+				if expr, ok := delc.Recv.List[0].Type.(*ast.StarExpr); ok {
+					receiverName = getIdentName(expr.X)
+				}
+			}
+			analysisFunErr(pass, delc, receiverName, fileConstMap)
+		default:
+			return true
+		}
+		return true
+	}
+
+	for _, f := range pass.Files {
+		ast.Inspect(f, inspect)
+	}
+	return nil, nil
+}
+
+func analysisFunErr(pass *analysis.Pass, funcDecl *ast.FuncDecl, receiverName string, fileConstMap map[string]string) {
+	results := funcDecl.Type.Results
+	if results == nil || len(results.List) == 0 {
+		return
+	}
+	returnErrFlag := false
+	for i := range results.List {
+		if err, ok := results.List[i].Type.(*ast.Ident); ok && err.Name == "error" {
+			returnErrFlag = true
+			break
+		}
+	}
+	if !returnErrFlag {
+		return
+	}
+	mName := funcDecl.Name.Name
+	constMap := make(map[string]string)
+	for i := range funcDecl.Body.List {
+		switch stmt := funcDecl.Body.List[i].(type) {
+		case *ast.DeclStmt:
+			if decl, ok := stmt.Decl.(*ast.GenDecl); ok && len(decl.Specs) > 0 {
+				for i := range decl.Specs {
+					if valSpec, ok := decl.Specs[i].(*ast.ValueSpec); ok && len(valSpec.Names) > 0 {
+						for j := range valSpec.Names {
+							if len(valSpec.Values) == len(valSpec.Names) {
+								if valueDefine, ok := valSpec.Values[j].(*ast.BasicLit); ok {
+									constMap[valSpec.Names[j].Name] = strings.ReplaceAll(valueDefine.Value, "\"", "")
+								}
+							}
+						}
+					}
+				}
+			}
+		case *ast.IfStmt:
+			processIfStmt(pass, stmt, mName, receiverName, constMap, fileConstMap)
+		case *ast.ReturnStmt:
+			processReturnStmt(pass, stmt, mName, receiverName, constMap, fileConstMap)
+		}
+	}
+}
+
+func processIfStmt(pass *analysis.Pass, stmt *ast.IfStmt, mName, receiverName string, constMap, fileConstMap map[string]string) {
+	for i := range stmt.Body.List {
+		switch newStmt := stmt.Body.List[i].(type) {
+		case *ast.IfStmt:
+			processIfStmt(pass, newStmt, mName, receiverName, constMap, fileConstMap)
+		case *ast.ReturnStmt:
+			processReturnStmt(pass, newStmt, mName, receiverName, constMap, fileConstMap)
+		}
+	}
+}
+
+func processReturnStmt(pass *analysis.Pass, stmt *ast.ReturnStmt, mName, receiverName string, constMap, fileConstMap map[string]string) {
+	for i := range stmt.Results {
+		if errCall, ok := stmt.Results[i].(*ast.CallExpr); ok {
+			if errNew, ok := errCall.Fun.(*ast.SelectorExpr); ok {
+				if pkgName, ok := errNew.X.(*ast.Ident); ok && pkgName.Name == "error" {
+					if errNew.Sel.Name == "New" {
+						if name, ok := fileConstMap[getIdentName(errCall.Args[0])]; ok && name != receiverName {
+							pass.Reportf(stmt.Pos(), "error.New use fault receiver name\n")
+						}
+						if name, ok := constMap[getIdentName(errCall.Args[1])]; ok && name != mName {
+							pass.Reportf(stmt.Pos(), "error.New use fault method name\n")
+						}
+					} else if errNew.Sel.Name == "Wrap" {
+						if name, ok := fileConstMap[getIdentName(errCall.Args[1])]; ok && name != receiverName {
+							pass.Reportf(stmt.Pos(), "error.Wrap use fault receiver name\n")
+						}
+						if name, ok := constMap[getIdentName(errCall.Args[2])]; ok && name != mName {
+							pass.Reportf(stmt.Pos(), "error.Wrap use fault method name\n")
+						}
+					}
+
+				}
+			}
+		}
+	}
+}
+
+func getIdentName(expr ast.Expr) string {
+	if ident, ok := expr.(*ast.Ident); ok {
+		return ident.Name
+	}
+	return ""
+}
+
 ```
 
 ### 5.golang Stringer生成方法
+参考https://github.com/golang/tools/blob/master/cmd/stringer/stringer.go完成
 ```go
 package main // import "golang.org/x/tools/cmd/stringer"
 
@@ -544,6 +551,6 @@ const stringMap = `func (i %[1]s) String() string {
 
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0NjkwNTU3NjksLTEwNDQwMjYyMDcsMj
-g0MjQzNDQzXX0=
+eyJoaXN0b3J5IjpbLTI5ODUyNTgwMywtMTQ2OTA1NTc2OSwtMT
+A0NDAyNjIwNywyODQyNDM0NDNdfQ==
 -->
