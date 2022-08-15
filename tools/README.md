@@ -5,7 +5,7 @@
 
 [3. golang 生成pprof的cpu，mem图和火焰图](./part1.md#3-golang-生成pprof的cpumem图和火焰图)
 
-[5.golang Stringer生成方法](./part1.md#4-golang Stringer生成方法)
+[5.golang Stringer生成方法](./part1.md#4-golang-Stringer生成方法)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTc5MTU2ODQ3OF19
+eyJoaXN0b3J5IjpbLTE1NDY5ODM2MzddfQ==
 -->
