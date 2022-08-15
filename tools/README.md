@@ -5,9 +5,10 @@
 
 [3. golang 生成pprof的cpu，mem图和火焰图](./part1.md#3-golang-生成pprof的cpumem图和火焰图)
 
-[4. golang使用analysis对代码静态检查](./part1.md#4-golang使用analysis对代码静态检查)
+[4. golang使用analysis对代码静态检查](./part1.md#4golang使用analysis对代码静态检查)
 
-[5. golang Stringer生成方法](./part1.md#5-golang-Stringer生成方法)
+[5. golang Stringer生成方法](./part1.md#5golang-Stringer生成方法)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjc1MzQ5Mjg1LDQzNDMxNDA1Ml19
+eyJoaXN0b3J5IjpbMjIyNTg3MjQzLDI3NTM0OTI4NSw0MzQzMT
+QwNTJdfQ==
 -->
