@@ -8,7 +8,10 @@
 [4. golang使用analysis对代码静态检查](./part1.md#4golang使用analysis对代码静态检查)
 
 [5. golang Stringer生成方法](./part1.md#5golang-Stringer生成方法)
+
+6. hugo集成到github上
+https://aegisprogram.github.io/posts/975b52b0.html
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjIyNTg3MjQzLDI3NTM0OTI4NSw0MzQzMT
-QwNTJdfQ==
+eyJoaXN0b3J5IjpbLTEwMjIxNjU5ODgsMjIyNTg3MjQzLDI3NT
+M0OTI4NSw0MzQzMTQwNTJdfQ==
 -->
