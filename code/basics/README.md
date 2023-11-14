@@ -234,10 +234,11 @@ function g_log_err() {
     local log_msg="[Error] $*"
     log "$log_msg"
 }
+g_log_err "Check error"
 ```
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExOTI2NjA2NSwyMDU1NDYyNjU0LC0xMz
+eyJoaXN0b3J5IjpbLTM4MTEyNjI1NSwyMDU1NDYyNjU0LC0xMz
 AxNDQwNjQzXX0=
 -->
