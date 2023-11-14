@@ -218,8 +218,26 @@ type serverRequest struct {
 }
 ```
 
+### 5、shell脚本日志打印
+```shell
+log() {
+    log_time=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "$log_time $*" | tee -a "$LOG_FILE"
+}
+
+function g_log_info() {
+    local log_msg="[Info] $*"
+    log "$log_msg"
+}
+
+function g_log_err() {
+    local log_msg="[Error] $*"
+    log "$log_msg"
+}
+```
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjA1NTQ2MjY1NCwtMTMwMTQ0MDY0M119
+eyJoaXN0b3J5IjpbLTExOTI2NjA2NSwyMDU1NDYyNjU0LC0xMz
+AxNDQwNjQzXX0=
 -->
